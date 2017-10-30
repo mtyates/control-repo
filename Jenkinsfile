@@ -8,7 +8,21 @@ node('tse-control-repo') {
         ansiColor('xterm') {
           sh(script: '''
             export PATH=$PATH:$HOME/.rbenv/bin
-            rbenv global 2.3.1
+
+            set +e
+            which rbenv &>/dev/null
+            if [ $? != 0 ]; then
+              set -e
+              git clone 'https://github.com/rbenv/rbenv.git' ~/.rbenv
+              mkdir -p "$(rbenv root)"/plugins
+              git clone 'https://github.com/rbenv/ruby-build.git' "$(rbenv root)"/plugins/ruby-build
+            fi
+            set -e
+
+            set +e
+            rbenv global 2.3.1 || rbenv install 2.3.1
+            set -e
+
             eval "$(rbenv init -)"
             bundle install
           ''')
